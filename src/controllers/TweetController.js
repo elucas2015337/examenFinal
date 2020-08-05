@@ -241,7 +241,30 @@ function retweet (req, res){
                 tweet.body = comentario;
                 tweet.fecha = new Date();
                 tweet.usuario = req.user.sub;
-                
+                tweet.retweetInfo = [{
+                    idUsuario: usuarioEncontrado.id,
+                    usuario: usuarioEncontrado.usuario,
+                    fecha: tweetEncontrado.fecha,
+                    body: tweetEncontrado.body
+                }]
+
+                //return res.send({ message: usuarioEncontrado.usuario })
+
+                tweet.save((err, tweetPublicado) => {
+                        if(err) return res.status(500).send({message: 'error al publicar el tweet'})
+                        if(tweetPublicado){
+                            res.status(200).send({usuario: req.user.usuario,
+                                                    fecha: tweetPublicado.fecha,
+                                                    comentario: tweetPublicado.body,
+                                                    retweet: '-------------------------',
+                                                    usuarioTweetOriginal: tweetPublicado.retweetInfo[0].usuario,
+                                                    fechaTweetOriginal: tweetPublicado.retweetInfo[0].fecha,
+                                                    tweet: tweetPublicado.retweetInfo[0].body})
+                        }else{
+                            res.status(404).send({message: 'no se ha podido publicar tu tweet'})
+                        }
+                        
+                    })
                 
             })
         })
