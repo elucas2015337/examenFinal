@@ -176,19 +176,15 @@ function showTweets(req, res){
         User.findOne({usuario: datos[1]}, (err, usuarioEncontrado)=>{
             if(err) return res.status(500).send({ message: 'Error en la petición de usuarios' })
             if(!usuarioEncontrado) return res.status(404).send({ message: 'No hemos encontrado el usuario solicitado' })
-            User.countDocuments({ _id: usuarioEncontrado.id, "seguidores.codigoUsuario": req.user.sub }, (err, siguiendo)=>{
-                if(siguiendo >= 1 || usuarioEncontrado.user == req.user.usuario){
-                    Tweet.find({ usuario: usuarioEncontrado.id }, (err, tweesEncontrados)=>{
+
+                    Tweet.find({ usuario: usuarioEncontrado.id }, {listaReaccionaron: 0, listaComentarios: 0}, (err, tweesEncontrados)=>{
                         if(err) return res.status(500).send({ message: 'Error en la petición de los Tweets' })
                         if(tweesEncontrados.length == 0) tweesEncontrados = 'Este usuario aún no tiene tweets'
                         //return res.send({ message: tweesEncontrados.length })
                         return res.status(200).send({ Tweets: tweesEncontrados })
 
                     })
-                }else{
-                    return res.send({ message: 'Aún no sigues a ' + usuarioEncontrado.usuario + ', síguelo para poder ver sus tweets' })
-                }
-            })
+                
         })
     }else{
         return res.send({ message: 'Ingrese el nombre del usuario del cual quiere ver los tweets' })
