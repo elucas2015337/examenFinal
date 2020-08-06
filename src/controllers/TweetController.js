@@ -236,19 +236,28 @@ function retweet (req, res){
             User.findById(tweetEncontrado.usuario, (err, usuarioEncontrado)=>{
                 if(err) return res.status(500).send({ message: 'error en la petición de usuarios' })
                 if(!usuarioEncontrado) return res.status(404).send({ message: 'No se ha encontrado el usuario' })
+
+                //============================================================================================
                 
+                Tweet.findOne({usuario: req.user.sub, "retweetInfo.idTweet": tweetEncontrado.id}, (err, retweetEncontrado)=>{
+                    if(err) return res.status(500).send({ message: "error en la petición de Tweets" })
+
+                    //return res.send({ message: retweetEncontrado })
+                    if(!retweetEncontrado){
+
+                    
+
                 var tweet = new Tweet();
                 tweet.body = comentario;
                 tweet.fecha = new Date();
                 tweet.usuario = req.user.sub;
                 tweet.retweetInfo = [{
+                    idTweet: tweetEncontrado.id,
                     idUsuario: usuarioEncontrado.id,
                     usuario: usuarioEncontrado.usuario,
                     fecha: tweetEncontrado.fecha,
                     body: tweetEncontrado.body
                 }]
-
-                //return res.send({ message: usuarioEncontrado.usuario })
 
                 tweet.save((err, tweetPublicado) => {
                         if(err) return res.status(500).send({message: 'error al publicar el tweet'})
@@ -265,7 +274,16 @@ function retweet (req, res){
                         }
                         
                     })
-                
+                }else{
+                    Tweet.findByIdAndDelete(retweetEncontrado.id, (err, tweeteliminado)=>{
+                        if(err) return res.status.send({ message: 'error en la petición de Tweets' })
+                        if(!tweeteliminado) return res.status(404).send({ message: 'error al eliminar el retweet' })
+                        return res.status(200).send({ message: 'tweet eliminado' })
+                    })
+                }               
+             })
+    //==============================================================================================
+            
             })
         })
     }else{

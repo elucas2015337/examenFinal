@@ -22,6 +22,7 @@ var TweetSchema = Schema({
         usuarioComentario: { type: Schema.ObjectId, ref: 'user' }
     }],
     retweetInfo: [{
+        idTweet: { type: Schema.ObjectId, ref: 'tweet' },
         idUsuario: { type: Schema.ObjectId, ref: 'user' },
         usuario: String,
         fecha: Date,
